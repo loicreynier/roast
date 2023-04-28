@@ -12,6 +12,10 @@ Post-processing toolbox for turbulence DNS simulations.
 
 ## About
 
+> **Warning**
+> ROAST is currently being rewritten,
+> all its features will be added back soon.
+
 <!-- start about -->
 
 **ROAST** (ROAST is an OpenSource Analysis Software for Turbulence) is a
