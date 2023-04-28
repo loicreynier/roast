@@ -2,7 +2,7 @@
 <!-- editorconfig-checker-disable -->
 
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/loicreynier/roast/main/.github/logo.png" width="300">
+  <img src="https://raw.githubusercontent.com/loicreynier/roast/main/.github/logo.png" width="200">
   <p>ROAST</p>
 </h1>
 
