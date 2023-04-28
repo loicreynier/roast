@@ -1,0 +1,32 @@
+# Nix generated
+/.pre-commit-config.yaml
+result
+
+# Compilation / optimization files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+build/
+dist/
+sdist/
+eggs/
+.eggs/
+*.egg-info
+*.egg
+
+# Environments
+.env
+.venv
+venv/
+env/
+env.bak/
+venv.bak/
+.direnv/
+
+# Sphinx documentation
+docs/_build*
+docs/build*
+
+# Data files
+/data

@@ -1,0 +1,2 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QROAST (ROAST is an OpenSource Analysis Software for Turbulence) is a Python package providing a post-processing toolbox for turbulence DNS simulations.\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\Qcomputation of descriptive quantities of incompressible flows\ncomputation of descriptive quantities of turbulent flows\nstatistic post-processing of simulation data\nsimulation result visualization\\E$"}
