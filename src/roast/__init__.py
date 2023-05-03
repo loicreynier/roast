@@ -58,5 +58,6 @@ from . import (  # noqa: 401
     run,
     simulation,
     stats,
+    turbu,
     utils,
 )

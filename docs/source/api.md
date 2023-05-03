@@ -25,6 +25,9 @@
 .. automodule:: roast.fft
    :members:
 
+.. automodule:: roast.turbu
+   :members:
+
 .. automodule:: roast.stats
    :members:
 ```
