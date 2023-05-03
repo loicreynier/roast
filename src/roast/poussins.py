@@ -116,6 +116,7 @@ CONFIG_DEFAULT: SimulationConfig = (  # Default POUSSINS config file
             ("a_tanh", 0.001),
             ("k_tanh", 0.5),
             ("mode_tanh", 1.0),
+            ("prepost_isotropy", False),
         ]
     )
 )
