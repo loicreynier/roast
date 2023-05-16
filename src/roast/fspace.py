@@ -87,6 +87,14 @@ class FSpace:
         """Laplacian of `u`."""
         return fftdiff.lap(u, self.fft)
 
+    def lap_inv(self, u: NDArray, tol: float = 1e-6) -> NDArray:
+        """Inverse Laplacian of `ù`."""
+        return fftdiff.lap_inv(u, self.fft, tol=tol)
+
+    def ugradu(self, u: NDArray, v: NDArray, w: NDArray) -> NDArray:
+        """Convection term of vector field (`u`, `v`, `w`)."""
+        return fftdiff.ugradu(u, v, w, self.fft)
+
     @classmethod
     def from_simu(
         cls,

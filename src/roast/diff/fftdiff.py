@@ -6,6 +6,7 @@ __all__ = [
     "curl",
     "grad",
     "lap",
+    "lap_inv",
     "rot",
 ]
 
@@ -14,6 +15,7 @@ import itertools
 import numpy as np
 from numpy.typing import NDArray
 
+from roast.fft import RFFT
 from roast.fft.typing import ROASTFFT
 
 
@@ -144,3 +146,39 @@ def lap(u: NDArray, fft: ROASTFFT) -> NDArray:
     u_c *= k2
 
     return fft.ifft(u_c).copy()
+
+
+def lap_inv(f: NDArray, fft: ROASTFFT, tol: float = 1e-6) -> NDArray:
+    """Inverse laplacian of `f̀`.
+
+    Warning
+    -------
+    This function is only compatible with real :class:`roast.fft.RFFT`
+    FFT objects.
+
+    Parameters
+    ----------
+    f : NDArray
+        Input field.
+    fft : ROASTFFT
+        FFT object used for computation.
+    tol : float, optional
+        Tolerance for singular values.
+
+    Returns
+    -------
+    u : NDArray
+    """
+    if not isinstance(fft, RFFT):
+        raise ValueError("FFT must be real (`roast.fft.RFFT`)")
+
+    k2 = np.zeros(fft.shape_spec)
+    f_c = fft.fft(f)
+
+    for i, j, k in itertools.product(*[range(n) for n in fft.shape_spec]):
+        m = (i, j, k)
+        k2[m] = fft.modes[0][i] ** 2 + fft.modes[1][j] ** 2 + fft.modes[2][k]
+        f_c[m] = 0.0 if k2[m] < tol else -f_c[m] / k2[m]
+    u = fft.ifft(f_c)
+
+    return u

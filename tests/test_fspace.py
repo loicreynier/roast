@@ -63,7 +63,7 @@ def test_fft_grad(
 def test_fft_div(
     fft_lib: Literal["numpy", "pyfftw"],
     shape: tuple[int, int, int] = (512, 256, 128),
-):
+) -> None:
     """Test FFT function space divergence computation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -84,7 +84,7 @@ def test_fft_div(
 def test_fft_lap(
     fft_lib: Literal["numpy", "pyfftw"],
     shape: tuple[int, int, int] = (512, 256, 128),
-):
+) -> None:
     """Test FFT function space laplacian computation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -99,3 +99,23 @@ def test_fft_lap(
         np.linalg.norm(lapf - lapf_n.real) / np.linalg.norm(lapf)
         < FLOAT_PRECISION
     )
+
+
+@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+def test_fft_lap_inv(
+    fft_lib: Literal["numpy", "pyfftw"],
+    shape: tuple[int, int, int] = (512, 256, 128),
+) -> None:
+    """Test FFT function space inverse laplacian computation.
+
+    Test is performed on the velocity first component of the VDINSE
+    pseudo-exact solution.
+    """
+    dom = Domain(shape)
+    flow = bflow.vdinse_solexact(dom, np.pi / 4.0)
+    fs = FSpace(dom, fft_lib=fft_lib)
+
+    f = flow[0]
+    f_n = fs.lap_inv(fs.lap(f))
+
+    assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION

@@ -14,7 +14,7 @@ FLOAT_PRECISION: float = 1e-12
 @pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
 def test_fft_diff(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
-):
+) -> None:
     """Test FFT-based derivation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -34,7 +34,7 @@ def test_fft_diff(
 @pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
 def test_fft_grad(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
-):
+) -> None:
     """Test FFT-based gradient computation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -60,7 +60,7 @@ def test_fft_grad(
 @pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
 def test_fft_div(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
-):
+) -> None:
     """Test FFT-based divergence computation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -80,7 +80,7 @@ def test_fft_div(
 @pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
 def test_fft_lap(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
-):
+) -> None:
     """Test FFT-based Laplacian computation on a Gaussian field."""
     dom = Domain(
         shape,
@@ -95,3 +95,23 @@ def test_fft_lap(
         np.linalg.norm(lapf - lapf_n.real) / np.linalg.norm(lapf)
         < FLOAT_PRECISION
     )
+
+
+@pytest.mark.parametrize("fft_class", [RFFT, RFFTW])
+def test_fft_lap_inv(
+    fft_class: ROASTFFT,
+    shape: tuple[int, int, int] = (256, 256, 256),
+) -> None:
+    """Test FFT-based inverse Laplacian computation.
+
+    Test is performed on the velocity first component of the VDINSE
+    pseudo-exact solution.
+    """
+    dom = Domain(shape)
+    flow = bflow.vdinse_solexact(dom, np.pi / 4.0)
+    fft = fft_class(dom.axes)
+
+    f = flow[0]
+    f_n = diff.fftdiff.lap_inv(diff.fftdiff.lap(f, fft), fft)
+
+    assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION
