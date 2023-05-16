@@ -89,11 +89,11 @@ def spectrum(
     Parameters
     ----------
     u : NDArray
-        Vector field 1st direction component.
+        Velocity field 1st direction component.
     v : NDArray
-        Vector field 2nd direction component.
+        Velocity field 2nd direction component.
     w : NDArray
-        Vector field 3rd direction component.
+        Velocity field 3rd direction component.
     fs : FSpace
         Associated function space used for FFT computation.
 

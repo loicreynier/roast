@@ -36,7 +36,7 @@ class FSpace:
     domain : :class:`roast.domain.Domain`
         Associated computation domain.
     shape : tuple[int, int, int]
-        Shape of the 3D flowo fields.
+        Shape of the 3D flow fields.
 
     Parameters
     ----------
