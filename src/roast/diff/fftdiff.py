@@ -8,6 +8,7 @@ __all__ = [
     "lap",
     "lap_inv",
     "rot",
+    "ugradu",
 ]
 
 import itertools
@@ -182,3 +183,29 @@ def lap_inv(f: NDArray, fft: ROASTFFT, tol: float = 1e-6) -> NDArray:
     u = fft.ifft(f_c)
 
     return u
+
+
+def ugradu(u: NDArray, v: NDArray, w: NDArray, fft: ROASTFFT) -> NDArray:
+    """Convection term of vector field (`u`, `v`, `w`).
+
+    Parameters
+    ----------
+    u : NDArray
+        Vector field 1st direction component.
+    v : NDArray
+        Vector field 2nd direction component.
+    w : NDArray
+        Vector field 3rd direction component.
+
+    Returns
+    -------
+    ugru : NDArray
+        Convection term.
+    """
+    dudx, dudy, dudz = grad(u, fft)
+    ugrux = u * dudx + v * dudy + w * dudz
+    dudx, dudy, dudz = grad(v, fft)
+    ugruy = u * dudx + v * dudy + w * dudz
+    dudx, dudy, dudz = grad(w, fft)
+    ugruz = u * dudx + v * dudy + w * dudz
+    return np.array((ugrux, ugruy, ugruz))
