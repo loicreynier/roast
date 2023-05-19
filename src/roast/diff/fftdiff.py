@@ -9,6 +9,7 @@ __all__ = [
     "lap_inv",
     "rot",
     "ugradu",
+    "ugradv",
 ]
 
 import itertools
@@ -209,3 +210,48 @@ def ugradu(u: NDArray, v: NDArray, w: NDArray, fft: ROASTFFT) -> NDArray:
     dudx, dudy, dudz = grad(w, fft)
     ugruz = u * dudx + v * dudy + w * dudz
     return np.array((ugrux, ugruy, ugruz))
+
+
+def ugradv(
+    u1: NDArray,
+    u2: NDArray,
+    u3: NDArray,
+    v1: NDArray,
+    v2: NDArray,
+    v3: NDArray,
+    fft: ROASTFFT,
+) -> NDArray:
+    r"""Convection term :math:`(\vec{u}\cdot\nabla)\vec{v}`.
+
+    Parameters
+    ----------
+    u1 : NDArray
+        First vector field 1st direction component.
+    u2 : NDArray
+        First vector field 2nd direction component.
+    u3 : NDArray
+        First vector field 3rd direction component.
+    w1 : NDArray
+        Second vector field 1st direction component.
+    w2 : NDArray
+        Second vector field 2nd direction component.
+    w3 : NDArray
+        Second vector field 3rd direction component.
+    fft : ROASTFFT
+        FFT object used for computation.
+
+    Returns
+    -------
+    ugrv : NDArray
+        Convection term.
+    """
+    dv1dx, dv1dy, dv1dz = grad(v1, fft)
+    dv2dx, dv2dy, dv2dz = grad(v2, fft)
+    dv3dx, dv3dy, dv3dz = grad(v3, fft)
+    return np.array(
+        (
+            u1 * dv1dx + u2 * dv1dy + u3 * dv1dz,
+            u1 * dv2dx + u2 * dv2dy + u3 * dv2dz,
+            u1 * dv3dx + u2 * dv3dy + u3 * dv3dz,
+        )
+    )
