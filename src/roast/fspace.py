@@ -107,6 +107,10 @@ class FSpace:
         r"""Convection term :math:`(\vec{u}\cdot\nabla)\vec{v}`."""
         return fftdiff.ugradv(u1, u2, u3, v1, v2, v3, self.fft)
 
+    def volume_integral(self, u: NDArray) -> float:
+        """Volume integral of `u`."""
+        return fftdiff.integral(u, self.domain.volume, self.fft)
+
     @classmethod
     def from_simu(
         cls,

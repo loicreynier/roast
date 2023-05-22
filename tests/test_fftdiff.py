@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+import scipy as sp
 
 from roast import bflow, diff
 from roast.domain import Domain
@@ -9,6 +10,7 @@ from roast.fft import FFT, FFTW, RFFT, RFFTW
 from roast.fft.typing import ROASTFFT
 
 FLOAT_PRECISION: float = 1e-12
+INTEGRAL_PRECISION_256: float = 1e-3
 
 
 @pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
@@ -115,3 +117,21 @@ def test_fft_lap_inv(
     f_n = diff.fftdiff.lap_inv(diff.fftdiff.lap(f, fft), fft)
 
     assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION
+
+
+@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+def test_fft_integral(
+    fft_class: ROASTFFT,
+    shape: tuple[int, int, int] = (256, 256, 256),
+) -> None:
+    """Test FFT-based volume integral computation."""
+    dom = Domain(shape)
+    fft = fft_class(dom.axes)
+    x, y, z = dom.mgrid
+    f = np.sin(x**2) * np.cos(y**2) * np.cos(z**2)
+
+    S, C = sp.special.fresnel(np.sqrt(2 * np.pi))
+    i = 2 * np.sqrt(2) * np.pi ** (3 / 2) * C**2 * S
+    i_n = diff.fftdiff.integral(f, dom.volume, fft)
+
+    assert np.abs(i - i_n) < INTEGRAL_PRECISION_256

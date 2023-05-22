@@ -5,6 +5,7 @@ __all__ = [
     "div",
     "curl",
     "grad",
+    "integral",
     "lap",
     "lap_inv",
     "rot",
@@ -255,3 +256,23 @@ def ugradv(
             u1 * dv3dx + u2 * dv3dy + u3 * dv3dz,
         )
     )
+
+
+def integral(u: NDArray, V: float, fft: ROASTFFT) -> float:
+    """Volume integral of `u` computed from the first mode of the FFT.
+
+    Parameters
+    ----------
+    u : NDArray
+        Input field.
+    V : float
+        Domain volume.
+    fft : ROASTFFT
+        FFT object used for computation.
+
+    Returns
+    -------
+    I : float
+        Volume integral.
+    """
+    return np.real(fft.fft(u)[0, 0, 0]) * V / np.prod(fft.shape_phys)

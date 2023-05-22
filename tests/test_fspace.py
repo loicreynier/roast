@@ -4,12 +4,14 @@ from typing import Literal
 
 import numpy as np
 import pytest
+import scipy as sp
 
 from roast import bflow
 from roast.domain import Domain
 from roast.fspace import FSpace
 
 FLOAT_PRECISION: float = 1e-12
+INTEGRAL_PRECISION_256: float = 1e-3
 
 
 @pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
@@ -119,3 +121,21 @@ def test_fft_lap_inv(
     f_n = fs.lap_inv(fs.lap(f))
 
     assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION
+
+
+@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+def test_fft_integral(
+    fft_lib: Literal["numpy", "pyfftw"],
+    shape: tuple[int, int, int] = (256, 256, 256),
+) -> None:
+    """Test FFT function space volume integral computation."""
+    dom = Domain(shape)
+    fs = FSpace(dom, fft_lib=fft_lib)
+    x, y, z = dom.mgrid
+    f = np.sin(x**2) * np.cos(y**2) * np.cos(z**2)
+
+    S, C = sp.special.fresnel(np.sqrt(2 * np.pi))
+    i = 2 * np.sqrt(2) * np.pi ** (3 / 2) * C**2 * S
+    i_n = fs.volume_integral(f)
+
+    assert np.abs(i - i_n) < INTEGRAL_PRECISION_256

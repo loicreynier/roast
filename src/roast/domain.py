@@ -32,6 +32,7 @@ class Domain:
         )
         self.x, self.y, self.z = self.axes
         self.mgrid = np.meshgrid(self.x, self.y, self.z, indexing="ij")
+        self.volume = np.prod([b[1] - b[0] for b in bounds])
 
     @classmethod
     def from_axes(
