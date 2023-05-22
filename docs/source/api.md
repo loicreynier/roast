@@ -13,6 +13,9 @@
 .. automodule:: roast.parallel
    :members:
 
+.. automodule:: roast.plot
+   :members:
+
 .. automodule:: roast.bflow
    :members:
 

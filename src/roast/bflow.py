@@ -32,6 +32,19 @@ def vdinse_solexact(
     t: float
     s: float, optional
         Density ratio.
+
+    Returns
+    -------
+    u : NDArray
+        Velocity field 1st direction component.
+    v : NDArray
+        Velocity field 2nd direction component.
+    w : NDArray
+        Velocity field 3rd direction component.
+    rho : NDArray
+        Density field.
+    p : NDArray
+        Pressure field.
     """
     x, y, z = domain.mgrid
     u = np.cos(t) * np.sin(x) * np.cos(y) * np.cos(z)
