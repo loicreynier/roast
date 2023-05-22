@@ -50,15 +50,19 @@ All the aforementioned subpackages are imported while importing `roast`.
 """
 
 from . import (  # noqa: 401
-    bflow,
-    domain,
-    flow,
-    fspace,
+    # Utilities
     parallel,
-    poussins,
-    run,
+    utils,
+    # Interfaces
+    domain,
+    fspace,
+    bflow,
     simulation,
+    # Modules
+    poussins,
+    # Computation
+    flow,
     stats,
     turbu,
-    utils,
+    run,
 )

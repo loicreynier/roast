@@ -11,7 +11,7 @@ analysis for turbulent flows.
 import numpy as np
 from numpy.typing import NDArray
 
-from .fspace import FSpace
+from roast.fspace import FSpace
 
 __all__ = [
     "pdf",
