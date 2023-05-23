@@ -11,9 +11,11 @@ from roast.fft.typing import ROASTFFT
 
 FLOAT_PRECISION: float = 1e-12
 INTEGRAL_PRECISION_256: float = 1e-3
+FFTS = [FFT, FFTW, RFFT, RFFTW]
+RFFTS = [RFFT, RFFTW]
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTS)
 def test_fft_diff(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
 ) -> None:
@@ -33,7 +35,7 @@ def test_fft_diff(
     assert np.all(err < FLOAT_PRECISION)
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTS)
 def test_fft_grad(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
 ) -> None:
@@ -59,7 +61,7 @@ def test_fft_grad(
     assert np.all(err < FLOAT_PRECISION)
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTS)
 def test_fft_div(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
 ) -> None:
@@ -79,7 +81,7 @@ def test_fft_div(
     )
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTS)
 def test_fft_lap(
     fft_class: ROASTFFT, shape: tuple[int, int, int] = (512, 256, 128)
 ) -> None:
@@ -99,7 +101,7 @@ def test_fft_lap(
     )
 
 
-@pytest.mark.parametrize("fft_class", [RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", RFFTS)
 def test_fft_lap_inv(
     fft_class: ROASTFFT,
     shape: tuple[int, int, int] = (256, 256, 256),
@@ -119,7 +121,7 @@ def test_fft_lap_inv(
     assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTS)
 def test_fft_integral(
     fft_class: ROASTFFT,
     shape: tuple[int, int, int] = (256, 256, 256),

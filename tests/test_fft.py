@@ -8,9 +8,10 @@ from roast.fft import FFT, FFTW, RFFT, RFFTW
 from roast.fft.typing import ROASTFFT
 
 FLOAT_PRECISION: float = 1e-12
+FFTs = [FFT, FFTW, RFFT, RFFTW]
 
 
-@pytest.mark.parametrize("fft_class", [FFT, FFTW, RFFT, RFFTW])
+@pytest.mark.parametrize("fft_class", FFTs)
 def test_round_trip(
     fft_class: ROASTFFT,
     shape: tuple[int, int, int] = (512, 256, 128),

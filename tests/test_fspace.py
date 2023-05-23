@@ -12,11 +12,13 @@ from roast.fspace import FSpace
 
 FLOAT_PRECISION: float = 1e-12
 INTEGRAL_PRECISION_256: float = 1e-3
+FFT_LIBS = ["numpy", "pyfftw"]
+FFT_LIB = Literal["numpy", "pyfftw"]
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_diff(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (512, 256, 128),
 ) -> None:
     """Test FFT function space derivation on a Gaussian field."""
@@ -35,9 +37,9 @@ def test_fft_diff(
     assert np.all(err < FLOAT_PRECISION)
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_grad(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (512, 256, 128),
 ) -> None:
     """Test FFT function space gradient computation on a Gaussian field."""
@@ -61,9 +63,9 @@ def test_fft_grad(
     assert np.all(err < FLOAT_PRECISION)
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_div(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (512, 256, 128),
 ) -> None:
     """Test FFT function space divergence computation on a Gaussian field."""
@@ -82,9 +84,9 @@ def test_fft_div(
     )
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_lap(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (512, 256, 128),
 ) -> None:
     """Test FFT function space laplacian computation on a Gaussian field."""
@@ -103,9 +105,9 @@ def test_fft_lap(
     )
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_lap_inv(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (512, 256, 128),
 ) -> None:
     """Test FFT function space inverse laplacian computation.
@@ -123,9 +125,9 @@ def test_fft_lap_inv(
     assert np.linalg.norm(f - f_n.real) / np.linalg.norm(f) < FLOAT_PRECISION
 
 
-@pytest.mark.parametrize("fft_lib", ["numpy", "pyfftw"])
+@pytest.mark.parametrize("fft_lib", FFT_LIBS)
 def test_fft_integral(
-    fft_lib: Literal["numpy", "pyfftw"],
+    fft_lib: FFT_LIB,
     shape: tuple[int, int, int] = (256, 256, 256),
 ) -> None:
     """Test FFT function space volume integral computation."""
