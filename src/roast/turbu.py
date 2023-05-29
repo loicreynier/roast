@@ -380,8 +380,8 @@ def integral_scale(E: NDArray, k: NDArray) -> float:
     return 3.0 * np.pi / 4.0 * np.trapz(E / k, x=k) / np.trapz(E, x=k)
 
 
-def kolmogorov_scale(L_0: float, l_t: float) -> float:
-    """Kolmogorov scale.
+def kolmogorov_scale(L_0: float, l_t: float, Re: float = 1000) -> float:
+    r"""Kolmogorov scale.
 
     Parameters
     ----------
@@ -389,11 +389,40 @@ def kolmogorov_scale(L_0: float, l_t: float) -> float:
         Integral scale.
     l_t : float
         Taylor microscale.
+    Re : float
+        Reynolds number.
 
     Returns
     -------
     eta : float
         Kolmogorov scale.
+
+    Notes
+    -----
+    Kolmogorov scale is computed from the large scale Reynolds number as
+
+    .. math::
+
+       \eta = \frac{\lambda^2L^2}{15\mathrm{Re}^2}.
+
+    This expression is obtained from the classical formula
+
+    .. math::
+
+       \eta = \left(\frac{\nu^3}{\epsilon}\right)^{\tfrac14}
+
+    where the kinetic viscosity and the energy dissipation have been
+    respectively substituted by
+
+    .. math::
+
+       \nu = \frac{u'L}{\mathrm{Re}}
+
+    and
+
+    .. math::
+
+       \langle\epsilon\rangle = \frac{15\nu{}u'^2}{\lambda^2}.
 
     See Also
     --------
@@ -401,7 +430,7 @@ def kolmogorov_scale(L_0: float, l_t: float) -> float:
     taylor_scale_iso
     integral_scale
     """
-    return l_t ** (3.0 / 2.0) / (15 ** (3.0 / 4.0) * L_0 ** (1.0 / 2.0))
+    return ((L_0 * l_t) ** 2 / (15 * Re**2)) ** 0.25
 
 
 def turnover_time(L_0: float, u: float) -> float:
