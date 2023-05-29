@@ -82,7 +82,7 @@ def spectrum(
     v: NDArray,
     w: NDArray,
     fs: FSpace,
-):
+) -> tuple[NDArray, NDArray]:
     """
     Spectral density of energy of the vector field (`u`, `v`, `w`).
 

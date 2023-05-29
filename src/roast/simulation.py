@@ -30,6 +30,7 @@ SimulationSnapID = str | int | float
 SimulationSnapRange = (
     tuple[SimulationSnapID | None, SimulationSnapID | None] | None
 )
+SimulationSnapData = SimulationSnapID | SimulationSnapRange
 
 
 class Simulation:

@@ -61,7 +61,7 @@ def pdf(
     u : NDArray
     bins : int, optional
     norm : bool, optional
-        Whether to normalize the PDF with the standart deviation of `u`.
+        Whether to normalize the PDF with the standard deviation of `u`.
 
     Returns
     -------
@@ -69,7 +69,7 @@ def pdf(
     vals : NDArray
     """
     freq, vals = np.histogram(u, bins=bins, density=True)
-    vals = (vals + np.roll(u, -1))[:-1] / 2.0
+    vals = (vals + np.roll(vals, -1))[:-1] / 2.0
     if norm:
         std = np.std(u)
         freq *= std

@@ -8,16 +8,18 @@ Provides wrappers to perform calculations over snapshots of a ROAST
 
 from typing import Callable
 
+import numpy as np
 from h5py import Group  # type: ignore
 from numpy.typing import DTypeLike
 
-from roast import parallel
+from roast import parallel, stats, turbu
 from roast.fspace import FSpace
 from roast.parallel import MPI4PY
-from roast.simulation import Simulation, SimulationSnapID, SimulationSnapRange
+from roast.simulation import Simulation, SimulationSnapData
 
 __all__ = [
     "compute",
+    "hit_analysis",
 ]
 
 
@@ -26,7 +28,7 @@ MPI = MPI4PY()
 
 def _snap_list(
     simu: Simulation,
-    data: SimulationSnapID | SimulationSnapRange = None,
+    data: SimulationSnapData = None,
 ) -> list[str]:
     """Simulation snapshot list."""
     if data is not None:
@@ -43,7 +45,7 @@ def compute(  # noqa: PLR0912
     simu: Simulation,
     fun: Callable,
     *args,
-    data: SimulationSnapID | SimulationSnapRange = None,
+    data: SimulationSnapData = None,
     fs: FSpace | None = None,
     store_params: dict[str, tuple[tuple, DTypeLike]] | None = None,
     **kwargs,
@@ -96,7 +98,7 @@ def compute(  # noqa: PLR0912
     ...     "u",
     ...     "v",
     ...     "w",
-    ...     store_params={"rms_u": ((), np.dtype(float))},
+    ...     store_params={"RMS_u": ((), np.dtype(float))},
     ... )
     """
     res: list | None = None
@@ -132,8 +134,19 @@ def compute(  # noqa: PLR0912
         fs_args = []
         for arg in args:
             if isinstance(arg, str):
-                if (snap[arg].shape == simu.shape).all():
-                    fs_args.append(fs(snap[arg][:]))  # type: ignore
+                starred = arg[0] == "*"
+                if starred:
+                    for var in np.asarray(snap[arg[1:]][:]):
+                        fs_args.append(var)
+                else:
+                    var = snap[arg]
+                    if var.shape == tuple(simu.shape):
+                        fs_args.append(fs(var[:]))  # type: ignore
+                    elif var.shape == ():
+                        fs_args.append(snap[arg][()])
+                    else:
+                        fs_args.append(snap[arg][:])
+                    del var
             else:
                 fs_args.append(arg)
 
@@ -156,3 +169,108 @@ def compute(  # noqa: PLR0912
     else:
         res = res_list
     return res
+
+
+def hit_analysis(
+    simu: Simulation,
+    data: SimulationSnapData = None,
+    fs: FSpace | None = None,
+    pdf_bins: float = 100,
+) -> None:
+    """Run isotropic turbulence post-processing analysis.
+
+    Compute:
+      * Velocity longitudinal derivative
+      * Velocity longitudinal derivavtive PDF
+      * Velocity field RMS
+      * Skewness factor
+      * Flatness factor
+      * Energy spectrum
+      * Taylor microscale
+      * Integral scale
+      * Eddy turnover time
+    """
+    if fs is None:
+        fs = FSpace.from_simu(simu)
+    compute(
+        simu,
+        fs.diff,
+        "u",
+        0,
+        store_params={"dudx": (simu.shape, float)},
+    )
+    compute(
+        simu,
+        stats.pdf,
+        "dudx",
+        norm=True,
+        bins=pdf_bins,
+        store_params={"PDF_dudx_norm": ((2, pdf_bins), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        stats.pdf,
+        "dudx",
+        norm=False,
+        bins=pdf_bins,
+        store_params={"PDF_dudx": ((2, pdf_bins), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        stats.rms,
+        "u",
+        "v",
+        "w",
+        store_params={"RMS_u": ((), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        stats.moment,
+        "dudx",
+        3,
+        store_params={"S": ((), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        stats.moment,
+        "dudx",
+        4,
+        store_params={"F": ((), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        turbu.tke_spectrum,
+        "u",
+        "v",
+        "w",
+        fs,
+        store_params={"E": ((2, min(simu.shape)), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        turbu.taylor_scale,
+        "*E",
+        store_params={"lambda": ((), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        turbu.integral_scale,
+        "*E",
+        store_params={"L": ((), float)},
+        data=data,
+    )
+    compute(
+        simu,
+        turbu.turnover_time,
+        "L",
+        "RMS_u",
+        store_params={"T_0": ((), float)},
+        data=data,
+    )
