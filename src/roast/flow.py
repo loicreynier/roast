@@ -16,6 +16,7 @@ __all__ = [
     "acceleration_vdinse_lagrangian",
     "acceleration_viscous",
     "energy",
+    "enstrophy",
     "vorticity",
     "vorticity_comp",
     "pressure_fp",
@@ -28,7 +29,7 @@ def energy(
     w: NDArray,
     rho: NDArray,
 ) -> NDArray:
-    """Kinetic energy
+    """Volumetric kinetic energy.
 
     Parameters
     ----------
@@ -305,6 +306,42 @@ def vorticity(
         + vorticity_comp(1, u, v, w, fs) ** 2
         + vorticity_comp(2, u, v, w, fs) ** 2
     )
+
+
+def enstrophy(
+    u: NDArray,
+    v: NDArray,
+    w: NDArray,
+    fs: FSpace,
+) -> float:
+    r"""Enstrophy defined as
+
+    .. math::
+
+       \mathcal{E} = \int_\Omega \|\omega\|^2 \, \mathrm{d}V.
+
+    Parameters
+    ----------
+    u : NDArray
+        Velocity field 1st direction component.
+    v : NDArray
+        Velocity field 2nd direction component.
+    w : NDArray
+        Velocity field 3rd direction component.
+    fs: FSpace
+        Associated function space used for differentiation.
+
+    Results
+    -------
+    E : float
+        Total enstrophy.
+    """
+    omega2 = (
+        vorticity_comp(0, u, v, w, fs) ** 2
+        + vorticity_comp(1, u, v, w, fs) ** 2
+        + vorticity_comp(2, u, v, w, fs) ** 2
+    )
+    return fs.volume_integral(omega2)
 
 
 def pressure_fp(
