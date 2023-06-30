@@ -26,57 +26,6 @@ __all__ = [
 ]
 
 
-def _spectrum_old(
-    vars: list[NDArray],
-    fs: FSpace,
-    power: float = 2.0,
-) -> tuple[NDArray, NDArray]:
-    """Spectrum monodimensionnal energy spectrum.
-
-    Parameters
-    ----------
-    vars : list[NDArray]
-        List of variables.
-    fs : FSpace
-        Associated function space used for FFT computation.
-
-    Returns
-    -------
-    E : NDArray
-        One-dimensional energy spectrum
-    k : NDArray
-        One-dimensional Fourier modes array
-
-    Warning
-    -------
-    This is the older implementation, see :f:`spectrumo`.
-
-    See Also
-    --------
-    spectrum
-    """
-    kk = np.meshgrid(*fs.fft.modes)
-    mk = np.sqrt(kk[0] * kk[0] + kk[1] * kk[1] + kk[2] * kk[2]).reshape(-1)
-
-    E = np.copy(mk)
-
-    for u_i in vars:
-        E += np.power(np.abs(fs.fft.fft(u_i) / u_i.size), power)
-
-    E, bins, _ = scipy.stats.binned_statistic(
-        mk,
-        E,
-        statistic="sum",
-        bins=min(vars[0].shape),
-    )
-
-    k = np.zeros((len(E),))
-    for i in range(len(bins) - 1):
-        k[i] = (bins[i] + bins[i + 1]) / 2.0
-
-    return E, k
-
-
 def spectrum(
     u: NDArray,
     v: NDArray,
@@ -137,13 +86,14 @@ def spectrum(
             + fs.fft.modes[2][i[2]] ** 2
         )
         E[i] = np.abs(u_c[i] ** 2 + v_c[i] ** 2 + w_c[i] ** 2)
-    E = 4.0 * np.pi * E.reshape(-1)
+    E = 2.0 * np.pi * E.reshape(-1)
     k = k.reshape(-1)
 
     stats, bin_edges, _ = scipy.stats.binned_statistic(
         k,
-        E,
-        statistic="sum",
+        E * k**2,
+        statistic="mean",  # We don't want to sum `k^2`
+        # statistic="sum",
         bins=max(u.shape + v.shape + w.shape),
     )
     bin_middles = np.zeros(*stats.shape)
