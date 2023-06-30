@@ -32,7 +32,7 @@ def spectrum(
     w: NDArray,
     fs: FSpace,
 ):
-    """
+    r"""
     Spectral density of energy of the vector field (`u`, `v`, `w`).
 
     Parameters
@@ -56,6 +56,19 @@ def spectrum(
     Notes
     -----
     Computation based on the derivation of section 3.2 of [1].
+
+    The turbulent kinetic energy is defined as
+
+    .. math::
+
+       \text{TKE}(t) = \int_0^\infty E(k, t) \,\mathrm{d}k
+
+    where the spectral density of energy is defined as a function
+    of the spectral tensor :math:`\phi_{ii}(k, t)`
+
+    .. math::
+
+        E(k,t) = 2 \pi k^2 \phi_{ii}(k, t).
 
     References
     ----------
